@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>TEAM HANDSOME! 好き顔TOP9</title>
+<style>
+:root{--ink:#171717;--gold:#b89455;--cream:#f7f3eb;--line:#d9d0c0;--muted:#777}
+*{box-sizing:border-box} body{margin:0;background:var(--cream);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif}
+button,input{font:inherit} .wrap{max-width:760px;margin:auto;padding:18px 14px 50px}
+header{text-align:center;padding:18px 0 12px} .mini{font-size:11px;letter-spacing:.25em;color:var(--gold);font-weight:800}
+h1{font-family:Georgia,"Times New Roman",serif;font-size:34px;letter-spacing:.04em;margin:7px 0 4px}
+.sub{font-size:12px;color:var(--muted)}
+.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:18px;margin-top:14px;box-shadow:0 6px 22px #0000000b}
+h2{font-size:18px;margin:0 0 10px} .note{font-size:12px;line-height:1.7;color:#666}
+.btn{border:0;border-radius:999px;padding:13px 18px;font-weight:800;cursor:pointer}
+.primary{background:var(--ink);color:#fff} .gold{background:var(--gold);color:#fff} .ghost{background:#fff;border:1px solid var(--line)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.search{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;outline:none}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.card{position:relative;border:1px solid var(--line);background:#fff;border-radius:14px;overflow:hidden;cursor:pointer}
+.card.off{opacity:.38} .photo{aspect-ratio:3/4;background:#eee;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.photo img{width:100%;height:100%;object-fit:cover} .ph{font-size:28px;color:#bbb}
+.name{padding:9px 7px;font-size:12px;text-align:center;font-weight:800;min-height:35px}
+.check{position:absolute;right:7px;top:7px;width:24px;height:24px;border-radius:50%;background:#fff;border:1px solid #ccc;display:grid;place-items:center;font-size:13px}
+.card.on .check{background:var(--gold);color:#fff;border-color:var(--gold)}
+.hidden{display:none!important}
+.battle{text-align:center} .progress{height:8px;background:#e8e1d5;border-radius:20px;overflow:hidden;margin:10px 0 18px}
+.bar{height:100%;background:var(--gold);width:0;transition:.2s}
+.vsgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fight{border:1px solid var(--line);background:#fff;border-radius:18px;overflow:hidden;cursor:pointer;box-shadow:0 8px 24px #0000000a}
+.fight .photo{aspect-ratio:3/4} .fight .name{font-size:16px;padding:13px}
+.vs{font-family:Georgia,serif;color:var(--gold);font-weight:700;font-size:12px;margin:8px 0}
+.result{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.rank{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden;text-align:center}
+.rank .photo{aspect-ratio:3/4} .rank .r{font-family:Georgia,serif;font-size:24px;color:var(--gold);padding-top:9px}
+.rank .name{font-size:13px} .score{font-size:11px;color:#777;padding:0 6px 10px}
+.filebox{border:2px dashed var(--line);padding:18px;border-radius:14px;text-align:center;background:#fffcf7}
+input[type=file]{width:100%}
+.map{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.mapitem{display:flex;gap:8px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:7px;background:#fff}
+.mapitem img{width:48px;height:62px;object-fit:cover;border-radius:8px;background:#eee}
+select{width:100%;padding:8px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.small{font-size:11px;color:#777}
+@media(max-width:520px){.grid{grid-template-columns:repeat(3,1fr)} .result{grid-template-columns:repeat(3,1fr)} .map{grid-template-columns:1fr} h1{font-size:30px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<div class="mini">TEAM HANDSOME!</div>
+<h1>好き顔 TOP9</h1>
+<div class="sub">歴代メンバー版 / 46人</div>
+</header>
+
+<section id="home" class="panel">
+<h2>① メンバーを選ぶ</h2>
+<div class="note">最初は46人全員が選択されています。外したい人がいたらタップして外してね。</div>
+<div class="tools">
+<button class="btn ghost" onclick="setAll(true)">全員選択</button>
+<button class="btn ghost" onclick="setAll(false)">全員解除</button>
+<button class="btn ghost" onclick="show('photos')">📷 写真を登録</button>
+</div>
+<input id="search" class="search" placeholder="名前で検索…" oninput="renderMembers()">
+<div id="memberGrid" class="grid" style="margin-top:12px"></div>
+<div class="row" style="justify-content:space-between;margin-top:14px">
+<div id="selectedInfo" class="small"></div>
+<button class="btn primary" onclick="startBattle()">② 好き顔バトルへ →</button>
+</div>
+</section>
+
+<section id="photos" class="panel hidden">
+<h2>📷 写真をまとめて登録</h2>
+<div class="note">スマホに保存した写真を一気に選べます。<b>写真ファイル名が「メンバー名.jpg」なら自動登録</b>、名前が違っても下の一覧から手動で割り当てできます。</div>
+<div class="filebox">
+<input id="files" type="file" accept="image/*" multiple onchange="loadFiles(event)">
+<div class="small" style="margin-top:8px">複数選択OK / 写真はこのブラウザ内に保存されます</div>
+</div>
+<div class="tools">
+<button class="btn gold" onclick="autoMatch()">ファイル名で自動登録</button>
+<button class="btn ghost" onclick="clearPhotos()">写真を全部リセット</button>
+<button class="btn primary" onclick="show('home')">← メンバー選択へ</button>
+</div>
+<div id="map" class="map"></div>
+</section>
+
+<section id="battle" class="panel hidden battle">
+<h2>② 好きな方をタップ！</h2>
+<div class="note">2人を比べて、直感で「好き！」と思う方をタップしてね。</div>
+<div class="progress"><div id="bar" class="bar"></div></div>
+<div id="count" class="small"></div>
+<div id="fight" class="vsgrid" style="margin-top:12px"></div>
+<div class="vs">VS</div>
+<button class="btn ghost" onclick="skipBattle()">この組み合わせをスキップ</button>
+</section>
+
+<section id="result" class="panel hidden">
+<h2 style="text-align:center">✨ あなたの好き顔 TOP9</h2>
+<div class="note" style="text-align:center">今回のバトル結果をもとにしたランキングです。</div>
+<div id="results" class="result" style="margin-top:14px"></div>
+<div class="tools" style="justify-content:center;margin-top:16px">
+<button class="btn primary" onclick="shareResult()">結果をシェア</button>
+<button class="btn ghost" onclick="restart()">もう一度やる</button>
+</div>
+</section>
+</div>
+
+<script>
+const MEMBERS=["青柳塁斗", "猪塚健太", "植原卓也", "賀来賢人", "風間由次郎", "神木隆之介", "小関裕太", "佐藤健", "戸谷公人", "野村周平", "平埜生成", "平間壮一", "松島庄汰", "三浦春馬", "水田航生", "柳澤貴彦", "吉沢亮", "吉村卓也", "渡部秀", "桜田通", "松岡広大", "溝口琢矢", "石賀和輝", "石原壮馬", "伊藤直人", "太田将熙", "甲斐翔真", "金子大地", "富田健太郎", "正木郁", "鈴木仁", "田川隼嗣", "福崎那由他", "藤原大祐", "細田佳央太", "三船海斗", "渡邊圭祐", "新原泰佑", "兵頭功海", "青山凌大", "徳永智加来", "林優大", "東島京", "本島純政", "松下優也", "岩崎友泰"];
+let selected = new Set(MEMBERS);
+let photos = {};
+let photoFiles = [];
+const PHOTO_DB='handsomePhotoDB';
+const PHOTO_STORE='photos';
+let photoDBReady=false;
+function openPhotoDB(){return new Promise((resolve,reject)=>{const r=indexedDB.open(PHOTO_DB,1);r.onupgradeneeded=()=>{if(!r.result.objectStoreNames.contains(PHOTO_STORE))r.result.createObjectStore(PHOTO_STORE);};r.onsuccess=()=>{photoDBReady=true;resolve(r.result)};r.onerror=()=>reject(r.error);});}
+async function loadPhotos(){
+ try{
+  const db=await openPhotoDB();
+  const stored=await new Promise((resolve,reject)=>{const tx=db.transaction(PHOTO_STORE,'readonly'),s=tx.objectStore(PHOTO_STORE),r=s.getAll();r.onsuccess=()=>resolve(r.result||[]);r.onerror=()=>reject(r.error);});
+  if(stored.length){photos={};stored.forEach(x=>{photos[x.name]=x.data;});}
+  else{
+   const old=JSON.parse(localStorage.getItem('handsomePhotos')||'{}');
+   if(Object.keys(old).length){photos=old;await savePhotos();try{localStorage.removeItem('handsomePhotos')}catch(e){}}
+  }
+ }catch(e){
+  try{photos=JSON.parse(localStorage.getItem('handsomePhotos')||'{}')}catch(_) {photos={};}
+ }
+ renderMembers();
+}
+async function savePhotos(){
+ if(!photoDBReady)return;
+ const db=await openPhotoDB();
+ await new Promise((resolve,reject)=>{const tx=db.transaction(PHOTO_STORE,'readwrite'),s=tx.objectStore(PHOTO_STORE);s.clear();Object.entries(photos).forEach(([name,data])=>s.put({name,data}));tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);});
+}
+
+let stats = {};
+let battleNo=0, totalBattles=80, pair=null;
+
+function savePhotos(){localStorage.setItem('handsomePhotos',JSON.stringify(photos));}
+function show(id){['home','photos','battle','result'].forEach(x=>document.getElementById(x).classList.toggle('hidden',x!==id)); if(id==='home')renderMembers(); if(id==='photos')renderMap();}
+function setAll(v){selected=v?new Set(MEMBERS):new Set();renderMembers();}
+function imgFor(n){return photos[n]||''}
+function renderMembers(){
+ const q=(document.getElementById('search').value||'').trim();
+ const el=document.getElementById('memberGrid');
+ el.innerHTML=MEMBERS.filter(n=>n.includes(q)).map(n=>`
+ <div class="card ${selected.has(n)?'on':'off'}" onclick="toggle('${esc(n)}')">
+  <div class="photo">${imgFor(n)?`<img src="${imgFor(n)}">`:'<div class="ph">♡</div>'}</div>
+  <div class="check">${selected.has(n)?'✓':''}</div>
+  <div class="name">${n}</div>
+ </div>`).join('');
+ document.getElementById('selectedInfo').textContent=`選択中：${selected.size}人 / 写真登録：${Object.keys(photos).length}人`;
+}
+function esc(s){return s.replace(/'/g,"\\'")}
+function toggle(n){selected.has(n)?selected.delete(n):selected.add(n);renderMembers();}
+function loadFiles(e){
+ photoFiles=Array.from(e.target.files||[]);
+ renderMap();
+}
+function fileToDataURL(file){
+ return new Promise((resolve,reject)=>{
+  const r=new FileReader();
+  r.onload=()=>resolve(r.result);
+  r.onerror=reject;
+  r.readAsDataURL(file);
+ });
+}
+function cleanBase(name){return name.replace(/\.[^.]+$/,'').replace(/\s+/g,'').replace(/[_-]/g,'');}
+async function autoMatch(){
+ let matched=0;
+ for(const f of photoFiles){
+   const b=cleanBase(f.name);
+   const n=MEMBERS.find(x=>cleanBase(x)===b);
+   if(n){
+     const data=await fileToDataURL(f);
+     photos[n]=data;
+     matched++;
+   }
+ }
+ await savePhotos(); renderMap(); renderMembers();
+ alert(`${matched}人分をファイル名から自動登録しました！`);
+}
+function renderMap(){
+ const el=document.getElementById('map');
+ if(!photoFiles.length){el.innerHTML='<div class="small">まだ写真が選択されていません。</div>';return;}
+ el.innerHTML=photoFiles.map((f,i)=>{
+   const src=URL.createObjectURL(f);
+   const opts=MEMBERS.map(n=>`<option value="${esc(n)}">${n}</option>`).join('');
+   return `<div class="mapitem"><img src="${src}"><div style="flex:1"><div class="small">${f.name}</div><select onchange="assignPhoto(${i},this.value)"><option value="">この写真を誰に？</option>${opts}</select></div></div>`;
+ }).join('');
+}
+function assignPhoto(i,n){
+ if(!n)return;
+ const f=photoFiles[i];
+ const r=new FileReader();
+ r.onload=async()=>{photos[n]=r.result;await savePhotos();renderMap();renderMembers();};
+ r.readAsDataURL(f);
+}
+async function clearPhotos(){if(confirm('登録した写真を全部リセットする？')){photos={};await savePhotos();renderMap();renderMembers();}}
+function startBattle(){
+ if(selected.size<2){alert('2人以上選んでね！');return;}
+ stats={}; [...selected].forEach(n=>stats[n]={w:0,l:0});
+ battleNo=0; totalBattles=Math.min(100,Math.max(50,Math.round(selected.size*1.8)));
+ show('battle'); nextBattle();
+}
+function pickPair(){
+ const arr=[...selected], ranked=arr.map(n=>{const s=stats[n]; return {n,score:(s.w+1)/(s.w+s.l+2)}}).sort((a,b)=>a.score-b.score);
+ let a=ranked[Math.floor(Math.random()*ranked.length)].n, b=a;
+ let tries=0; while(b===a && tries++<30)b=arr[Math.floor(Math.random()*arr.length)];
+ return [a,b];
+}
+function nextBattle(){
+ if(battleNo>=totalBattles){finish();return;}
+ pair=pickPair();
+ const [a,b]=pair;
+ document.getElementById('count').textContent=`${battleNo+1} / ${totalBattles}`;
+ document.getElementById('bar').style.width=`${battleNo/totalBattles*100}%`;
+ document.getElementById('fight').innerHTML=[a,b].map(n=>`
+ <button class="fight" onclick="vote('${esc(n)}')">
+  <div class="photo">${imgFor(n)?`<img src="${imgFor(n)}">`:'<div class="ph">♡</div>'}</div>
+  <div class="name">${n}</div>
+ </button>`).join('');
+}
+function vote(winner){
+ const loser=pair.find(x=>x!==winner);
+ stats[winner].w++; stats[loser].l++; battleNo++; nextBattle();
+}
+function skipBattle(){battleNo++;nextBattle();}
+function finish(){
+ const ranking=[...selected].map(n=>{
+   const s=stats[n], rate=(s.w+1)/(s.w+s.l+2);
+   return {n,rate,w:s.w,l:s.l};
+ }).sort((a,b)=>b.rate-a.rate);
+ document.getElementById('results').innerHTML=ranking.slice(0,9).map((x,i)=>`
+ <div class="rank">
+  <div class="r">${i+1}</div>
+  <div class="photo">${imgFor(x.n)?`<img src="${imgFor(x.n)}">`:'<div class="ph">♡</div>'}</div>
+  <div class="name">${x.n}</div>
+  <div class="score">${x.w}勝 / ${x.l}敗</div>
+ </div>`).join('');
+ show('result');
+}
+function shareResult(){
+ const names=[...document.querySelectorAll('#results .name')].map(x=>x.textContent);
+ const text='TEAM HANDSOME! 好き顔TOP9\n'+names.map((n,i)=>`${i+1}位：${n}`).join('\n');
+ if(navigator.share) navigator.share({title:'TEAM HANDSOME! 好き顔TOP9',text});
+ else navigator.clipboard?.writeText(text).then(()=>alert('結果をコピーしたよ！'));
+}
+function restart(){show('home');}
+loadPhotos();
+</script>
+</body>
+</html>
